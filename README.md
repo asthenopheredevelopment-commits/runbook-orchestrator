@@ -180,10 +180,4 @@ jobs:
 - **MCP** — Model Context Protocol for tool discovery
 - **Node.js 20+** — ESM modules
 
-## Targeting Kindo
 
-This project demonstrates three capabilities Kindo looks for in AI-platform engineers:
-
-1. **Agent Architecture** — typed state machines for autonomous multi-agent execution
-2. **DevSecOps Automation** — policy-aware runbook execution with HITL approval gates
-3. **Type Safety at Scale** — compile-time + runtime validation preventing LLM hallucinations from reaching infrastructure
