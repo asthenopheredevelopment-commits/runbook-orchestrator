@@ -1,0 +1,25 @@
+{
+  "name": "runbook-orchestrator",
+  "version": "1.0.0",
+  "description": "Multi-Agent DevOps Runbook Orchestrator — typed state machine for autonomous infrastructure operations with MCP, HITL gates, and Zod-validated tool registry",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit --strict",
+    "typecheck": "tsc --noEmit --strict",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit --strict",
+    "start": "node --loader ts-node/esm src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^22.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.24.0",
+    "zod-validation-error": "^3.4.0"
+  }
+}
