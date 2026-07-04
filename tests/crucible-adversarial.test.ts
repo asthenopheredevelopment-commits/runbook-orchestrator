@@ -21,7 +21,7 @@ import { ToolRegistry, defineTool } from '../src/engine/tool-registry.js'
 import { Orchestrator } from '../src/engine/orchestrator.js'
 import { createAgent, applyEvent } from '../src/types/agent.js'
 import { validateRunbook, topoSort, RunbookSchema } from '../src/types/runbook.js'
-import { ApprovalGate, createExecutionId } from '../src/hitl/approval-gate.js'
+import { ApprovalGate } from '../src/hitl/approval-gate.js'
 import { mockBashTool } from '../src/tools/mock-bash.js'
 import { mockCloudTool } from '../src/tools/mock-cloud.js'
 

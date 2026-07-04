@@ -20,6 +20,7 @@ export interface OrchestratorResult {
   results: Map<string, unknown>
   logs: ExecutionLog
   error: string | undefined
+  pendingExecutionId?: string
 }
 
 export class Orchestrator {
@@ -74,26 +75,30 @@ export class Orchestrator {
   async execute(): Promise<OrchestratorResult> {
     this.log('system', 'orchestrator', `Starting runbook: ${this.plan.runbookName}`)
 
-    this.state = transitionState(this.state, { type: 'LEVEL_COMPLETED', level: -1 })
+    if (this.state.status === 'initialized') {
+      this.state = transitionState(this.state, { type: 'LEVEL_COMPLETED', level: -1 })
+    }
+
+    const startLevel = this.state.status === 'running' ? this.state.currentLevel : 0
 
     try {
-      for (let level = 0; level < this.plan.levels.length; level++) {
+      for (let level = startLevel; level < this.plan.levels.length; level++) {
         const taskIds = this.plan.levels[level]!
         this.log('system', 'orchestrator', `Executing level ${level}: ${taskIds.join(', ')}`)
 
-        const levelResults = await Promise.all(
-          taskIds.map((taskId) => this.executeTask(taskId)),
-        )
+        for (const taskId of taskIds) {
+          const result = await this.executeTask(taskId)
 
-        for (const result of levelResults) {
           if (!result.success) {
             if (result.needsApproval) {
               this.state = {
                 status: 'awaiting_approval',
                 plan: this.plan,
-                taskId: result.needsApproval.executionId,
+                taskId,
                 policyViolation: result.needsApproval.policyViolation,
                 executionId: result.needsApproval.executionId,
+                currentLevel: level,
+                taskResults: this.state.status === 'running' ? this.state.taskResults : new Map(),
               }
               return {
                 success: false,
@@ -101,6 +106,7 @@ export class Orchestrator {
                 results: new Map(),
                 logs: this.logs,
                 error: `Pending approval: ${result.needsApproval.policyViolation}`,
+                pendingExecutionId: result.needsApproval.executionId,
               }
             }
 
@@ -117,10 +123,7 @@ export class Orchestrator {
           }
 
           if (result.result !== undefined && this.state.status === 'running') {
-            this.state.taskResults.set(
-              result.needsApproval?.executionId ?? taskIds[0]!,
-              result.result,
-            )
+            this.state.taskResults.set(taskId, result.result)
           }
         }
 

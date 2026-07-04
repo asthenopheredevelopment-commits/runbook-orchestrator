@@ -104,10 +104,8 @@ async function main(): Promise<void> {
 
     if (answer.trim().toLowerCase() === 'approve') {
       console.log('  ✓ Approval granted, continuing execution...')
-      const resumed = await orchestrator.handleApproval(
-        createExecutionId('generate-new-key'),
-        true,
-      )
+      const executionId = result.pendingExecutionId ?? createExecutionId('generate-new-key')
+      const resumed = await orchestrator.handleApproval(executionId, true)
       printResult(resumed)
     } else {
       console.log('  ✗ Execution cancelled by operator')

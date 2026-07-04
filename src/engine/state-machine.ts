@@ -3,7 +3,7 @@ import type { ExecutionPlan, RollbackStep } from '../types/runbook.js'
 export type OrchestratorState =
   | { status: 'initialized'; plan: ExecutionPlan }
   | { status: 'running'; plan: ExecutionPlan; currentLevel: number; taskResults: Map<string, unknown> }
-  | { status: 'awaiting_approval'; plan: ExecutionPlan; taskId: string; policyViolation: string; executionId: string }
+  | { status: 'awaiting_approval'; plan: ExecutionPlan; taskId: string; policyViolation: string; executionId: string; currentLevel: number; taskResults: Map<string, unknown> }
   | { status: 'completed'; plan: ExecutionPlan; results: Map<string, unknown> }
   | { status: 'failed'; taskId: string; error: string; rollbackTaskId: string | null }
   | { status: 'rolling_back'; taskId: string; rollbackSteps: Array<{ taskId: string; rollback: RollbackStep }> }
@@ -72,8 +72,8 @@ export function transitionState(
         return {
           status: 'running',
           plan: state.plan,
-          currentLevel: 0,
-          taskResults: new Map(),
+          currentLevel: state.currentLevel,
+          taskResults: state.taskResults,
         }
       }
       return {
